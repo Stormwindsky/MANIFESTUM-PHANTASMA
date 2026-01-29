@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subject Viewer - MANIFESTUM PHANTASMA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        body { background-color: #0a0a0a; color: #c0c0c0; font-family: 'Courier Prime', monospace; margin: 0; padding: 20px; }
+        #container { max-width: 900px; margin: 0 auto; border: 1px solid #333; background-color: #111; padding: 30px; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+        header { border-bottom: 2px solid #444; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        h1 { color: #ff4444; font-size: 1.2em; margin: 0; }
+        .back-btn { color: #00ff00; text-decoration: none; font-weight: bold; border: 1px solid #00ff00; padding: 5px 10px; font-size: 0.8em; }
+        #file-content { background: #0d0d0d; border: 1px solid #222; padding: 20px; min-height: 500px; }
+        /* Style Markdown */
+        h1, h2, h3 { color: #ff4444; text-transform: uppercase; border-bottom: 1px solid #333; }
+        strong { color: #fff; }
+        hr { border: 0; border-top: 1px solid #444; margin: 20px 0; }
+        footer { margin-top: 30px; font-size: 0.7em; color: #555; text-align: center; }
+    </style>
+</head>
+<body>
+<div id="container">
+    <header>
+        <h1>MANIFESTUM PHANTASMA // DATA_VIEWER</h1>
+        <a href="index.html" class="back-btn"><< RETURN TO DATABASE</a>
+    </header>
+    <div id="file-content">
+        <p style="color: #888; font-style: italic;">Loading encrypted data...</p>
+    </div>
+    <footer>
+        <p>&copy; 2026 MANIFESTUM PHANTASMA BUREAU - CC-BY-4.0</p>
+    </footer>
+</div>
+
+<script>
+    const GITHUB_USER = 'stormwindsky';
+    const GITHUB_REPO = 'MANIFESTUM-PHANTASMA';
+    
+    async function loadSubject() {
+        // Récupère ce qui est après le ?=
+        const urlParams = window.location.search;
+        const fileName = urlParams.split('?=')[1];
+
+        if (!fileName) {
+            document.getElementById('file-content').innerHTML = "ERROR: NO SUBJECT SPECIFIED.";
+            return;
+        }
+
+        try {
+            // URL directe pour le contenu brut (raw)
+            const rawUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/Subjects/${fileName}`;
+            const response = await fetch(rawUrl);
+            
+            if (!response.ok) throw new Error();
+            
+            const markdown = await response.text();
+            document.getElementById('file-content').innerHTML = marked.parse(markdown);
+            document.title = fileName.replace('.md', '') + " - MANIFESTUM PHANTASMA";
+        } catch (e) {
+            document.getElementById('file-content').innerHTML = "CRITICAL ERROR: SUBJECT NOT FOUND OR ACCESS DENIED.";
+        }
+    }
+
+    window.onload = loadSubject;
+</script>
+</body>
+</html>
